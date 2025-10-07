@@ -1,0 +1,28 @@
+<% layout("/layouts/boilerplate") %>
+
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="alert alert-danger" role="alert">
+        <div class="d-flex">
+          <div class="flex-shrink-0">
+            <i class="fas fa-exclamation-triangle fa-2x me-3"></i>
+          </div>
+          <div>
+            <h4 class="alert-heading">Error!</h4>
+            <p><%= message %></p>
+            <hr>
+            <div class="d-flex justify-content-between">
+              <a href="/listings/new" class="btn btn-outline-danger">
+                <i class="fas fa-arrow-left me-2"></i>Back to Form
+              </a>
+              <a href="/listings" class="btn btn-danger">
+                <i class="fas fa-list me-2"></i>View All Listings
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

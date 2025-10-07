@@ -1,0 +1,169 @@
+<% layout("/layouts/boilerplate") %>
+<style>
+  .show-img {
+    height: 400px;
+    object-fit: cover;
+  }
+  .show-card {
+    margin-bottom: 2rem;
+  }
+  /* New styles for review section */
+  .review-card {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+  }
+   .star-rating {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    font-size: 1.8rem;
+    line-height: 1;
+    margin-bottom: 15px;
+  }
+  .star-rating input {
+    display: none;
+  }
+  .star-rating label {
+    color: #ccc;
+    cursor: pointer;
+    padding: 0 3px;
+  }
+  .star-rating input:checked ~ label,
+  .star-rating label:hover,
+  .star-rating label:hover ~ label {
+    color: #ffc107;
+  }
+  .star-ratingu {
+    color: #ffc107;
+    font-size: 1.2rem;
+    margin-bottom: 5px;
+  }
+  .review-comment {
+    color: #333;
+    margin-bottom: 5px;
+  }
+  .review-author {
+    color: #777;
+    font-size: 0.9rem;
+  }
+  /* Rating input styles */
+  .rating-input {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 15px;
+    flex-direction: row; /* Changed from row-reverse to row */
+  }
+  .rating-input input {
+    display: none;
+  }
+  .rating-input label {
+    font-size: 1.5rem;
+    color: #ccc;
+    cursor: pointer;
+    order: 1; /* Ensures proper hover/selection behavior */
+  }
+  .rating-input input:checked ~ label,
+  .rating-input label:hover,
+  .rating-input label:hover ~ label {
+    color: #ffc107;
+  }
+  /* Fix the hover/selection behavior for left-to-right */
+  .rating-input input:checked + label,
+  .rating-input input:focus + label,
+  .rating-input label:hover,
+  .rating-input label:hover ~ label:not(:hover) {
+    color: #ffc107;
+  }
+</style>
+
+<div class="container">
+  <h3 class="my-4"> <%= listing.title %></h3>
+  
+  <div class="card col-8 offset-2 show-card listing-card">
+    <img src="<%= listing.image?.url || 'https://via.placeholder.com/600' %>"
+     class="card-img-top show-img"
+     alt="<%= listing.title %>" />
+    <div class="card-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><strong>Owned By:</strong> <%= listing.owner.username %></li>
+        <br/>
+        <li class="list-group-item"><strong>Title:</strong> <%= listing.title %></li>
+        <br/>
+
+        <li class="list-group-item"><strong>Description:</strong> <%= listing.description %></li>
+        <li class="list-group-item"><strong>Price:</strong> ₹<%= listing.price.toLocaleString('en-IN') %> / night</li>
+        <li class="list-group-item"><strong>Location:</strong> <%= listing.location %></li>
+        <li class="list-group-item"><strong>Country:</strong> <%= listing.country %></li>
+      </ul>
+    </div>
+  </div>
+
+
+
+ 
+  <div class="text-center mt-4">
+    <a href="/listings/<%= listing._id %>/edit" class="btn btn-primary me-5">Edit this Listing</a>
+    <form method="POST" action="/listings/<%= listing._id %>?_method=DELETE" class="d-inline">
+      <button class="btn btn-danger">Delete this listing</button>
+    </form>
+  </div>
+
+
+<!-- Reviews -->
+<div class="col-8 offset-3 mb-3">
+<% if (currUser) { %>
+ 
+     <h4>Leave a review</h4>
+     <form action="/listings/<%= listing._id %>/reviews" method="POST" novalidate class="needs-validation">
+       <div class="mb-3 mt-3">
+         <label class="form-label">Rating</label>
+        <div class="star-rating">
+           <input type="radio" id="star5" name="review[rating]" value="5">
+           <label for="star5" title="5 stars">★</label>
+           <input type="radio" id="star4" name="review[rating]" value="4">
+           <label for="star4" title="4 stars">★</label>
+           <input type="radio" id="star3" name="review[rating]" value="3">
+           <label for="star3" title="3 stars">★</label>
+           <input type="radio" id="star2" name="review[rating]" value="2">
+           <label for="star2" title="2 stars">★</label>
+           <input type="radio" id="star1" name="review[rating]" value="1">
+           <label for="star1" title="1 star">★</label>
+         </div>
+       </div>
+ 
+       <div class="mb-3 mt-3">
+         <label for="comment" class="form-label">Comment</label>
+         <textarea name="review[comment]" class="form-control" rows="5" required></textarea>
+         <div class="invalid-feedback">Please add some comments for reviews</div>
+       </div>
+       <button type="submit" class="btn btn-outline-dark">Submit</button>
+     </form>
+<% } %>
+
+    <hr />
+    <h4><b>All Reviews</b></h4>
+    
+    <% if (listing.reviews && listing.reviews.length > 0) { %>
+      <% listing.reviews.forEach(review => { %>
+        <div class="review-card">
+          <div class="star-ratingu">
+            <% for (let i = 1; i <= 5; i++) { %>
+              <span class="<%= i <= review.rating ? 'text-warning' : 'text-muted' %>">★</span>
+            <% } %>
+            <span class="ms-2"><%= review.rating %>/5</span>
+          </div>
+          <p class="review-comment"><%= review.comment %></p>
+          <p class="review-author">Posted by <%=  review.author.username %></p>
+          <form method="POST" action="/listings/<%= listing._id %>/reviews/<%= review._id %>?_method=DELETE" >
+    <button class="btn btn-sm btn-dark">Delete</button>
+</form>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <p class="text-muted">No reviews yet. Be the first!</p>
+    <% } %>
+  </div>
+</div>
